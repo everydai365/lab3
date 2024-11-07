@@ -65,7 +65,7 @@ import pox.openflow.libopenflow_01 as of
 # If you want, you can define global variables, import Python built-in libraries, or do others
 ###
 
-def init(net) -> None:
+def init(self, net) -> None:
     #
     # net argument has following structure:
     # 
@@ -98,7 +98,7 @@ def init(net) -> None:
     # YOUR CODE HERE
     ###
 
-def addrule(switchname: str, connection) -> None:
+def addrule(self, switchname: str, connection) -> None:
     #
     # This function is invoked when a new switch is connected to controller
     # Install table entry to the switch's routing table
@@ -118,7 +118,7 @@ def addrule(switchname: str, connection) -> None:
 
 from scapy.all import * # you can use scapy in this task
 
-def handlePacket(switchname, event, connection):
+def handlePacket(self, switchname, event, connection):
     packet = event.parsed
     if not packet.parsed:
         print('Ignoring incomplete packet')
@@ -151,6 +151,9 @@ def handlePacket(switchname, event, connection):
     # Refer to [ofp_packet_out - Sending packets from the switch](https://noxrepo.github.io/pox-doc/html/#ofp-packet-out-sending-packets-from-the-switch)
     # You may learn from [l2_learning.py](pox/pox/forwarding/l2_learning.py), which implements learning switches
     
+    # You can access other switches via self.controller.switches
+    # For example, self.controller.switches[0].connection.send(msg)
+
     ###
     # YOUR CODE HERE
     ###
