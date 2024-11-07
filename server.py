@@ -15,14 +15,12 @@ class CS341RequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             client = self.client_address[0]
             self.wfile.write(f'Hello {client}, I am {host}\n'.encode('utf-8'))
-            print(f'Hello {client}, I am {host}\n'.encode('utf-8'))
         else:
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
             self.end_headers()
             client = self.client_address[0]
-            self.wfile.write(f'Hello {client}, I am {host}\n'.encode('utf-8'))
-            print(f'Hello {client}, I am not {host}\n'.encode('utf-8'))
+            self.wfile.write(f'Hello {client}, I am not {host}\n'.encode('utf-8'))
 
     def do_POST(self):
         self.do_GET()
