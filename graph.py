@@ -12,10 +12,10 @@ def gen_graph(task=1):
 
     switchneighbors = {s:set() for s in switches}
 
-    if task in range(1,4): # For task 1, 2, 3
+    if task == 2 or task == 3 or task == 7: # For task 2, 3, 7
         # increase number of switches and hosts to make more complex and bigger network
-        switch=5
-        host=3
+        switch=10
+        host=5
         
         switches = ['s{}'.format(i) for i in range(1, 1+switch)]
         hosts = ['h{}'.format(i) for i in range(1, 1+host)]
@@ -46,7 +46,7 @@ def gen_graph(task=1):
                 random.randint(1 << 15, 1 << 30)
             ))
 
-    if task == 3: # For task 3
+    if task == 3 or task == 7: # For task 3, 7
         # For testing Dijkstra,
         # Add more links between switches, possibly making loop
         for _ in range(switch * 2):
@@ -60,8 +60,8 @@ def gen_graph(task=1):
                     s2,
                     random.randint(1 << 15, 1 << 30)
                 ))
-    if task in range(4,6): # For task 4, 5
-        ## # KAIST CS341 SDN Lab Task 4, 5
+    if task in range(4,7): # For task 4, 5, 6
+        ## # KAIST CS341 SDN Lab Task 4, 5, 6
         #
         # Simple structure: only one switch and lots of hosts
         switch=1

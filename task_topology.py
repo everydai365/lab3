@@ -15,11 +15,6 @@ class Topology(Topo):
         #     -> List of links, which is represented by a tuple
         #        The first and the second components represents name of the components
         #        The third component represents cost of the link; not used in this task
-                
-        ###
-        # YOUR CODE HERE
-        ###
-
         '''
         # ex) switches = ['s1'], hosts = ['h1'], links = [('s1','h1',100),]
         self.addSwitch('s1')
@@ -27,3 +22,7 @@ class Topology(Topo):
         self.addLink('s1', 'h1')
         '''
         pass
+                
+        ###
+        # YOUR CODE HERE
+        ###

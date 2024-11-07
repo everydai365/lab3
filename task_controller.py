@@ -25,16 +25,16 @@ import pox.openflow.libopenflow_01 as of
 #   - Let switches route via Dijkstra
 #   - Match ARP and ICMP over IPv4 packets
 #
-# Task 4: Implementing simple DNS-based censorship 
+# Task 4: Redirecting all DNS request packets to controller 
 #   - Let switches send all DNS packets to Controller
 #       - Create proper forwarding rules, send all DNS queries and responses to the controller
 #       - HTTP traffic should not be forwarded to the controller
-#   - Check if DNS query contains cs341dangerous.com
-#       - For such query, drop it and reply it with empty DNS response
-#       - For all other packets, route them normally
 #       
-#
-# Task 5: Implementing more efficient DNS-based censorship 
+# Task 5: Implementing a Simple DNS-based Censorship
+#   - Check DNS request
+#       - If request contains task5-block.com, return empty DNS response instead of routing it
+#       
+# Task 6: Implementing more efficient DNS-based censorship 
 #   - Let switches send only DNS query packets to Controller
 #       - Create proper forwarding rules, send only DNS queries to the controller
 #   - Check if DNS query contains cs341dangerous.com
@@ -44,10 +44,25 @@ import pox.openflow.libopenflow_01 as of
 #           - parse DNS response, insert a new rule to block all traffic from/to the server
 #           - reply the DNS request with empty DNS response
 #       - For all other packets, route them normally
+#
+# Task 7: Extending Censorship to Normal Network
+#   - At any time, HTTP and DNS server can be changed by following:
+#     - Create new server, hosting either task7-block-<one or more digits>.com or task7-open-<one or more digits>.com
+#       - DNS server adds new record, HTTP server adds new domain
+#     - For certain domain, hosting server changes
+#       - DNS server changes record, HTTP server is replaced to another one
+#     - For certain domain, hosting stops
+#       - DNS server removes record, HTTP server removes the domain
+#  - For 3 changes above, HTTP servers and DNS servers are changed instantly
+#  - Assume that
+#    - single IP might host multiple domains
+#    - the IP should be blocked if it hosts at least one task7-block-<one or more digits>.com
+#    - Only one IP is assigned to one domain
+#    - If you detect different DNS response for same DNS request, assume that previous IP does not host the domain anymore
 
 
 ###
-# If you want, you can define global variables, import libraries, or do others
+# If you want, you can define global variables, import Python built-in libraries, or do others
 ###
 
 def init(net) -> None:
@@ -78,10 +93,10 @@ def init(net) -> None:
     #     }
     # }
     #
+    pass
     ###
     # YOUR CODE HERE
     ###
-    pass
 
 def addrule(switchname: str, connection) -> None:
     #
@@ -96,10 +111,10 @@ def addrule(switchname: str, connection) -> None:
     # your code will be look like:
     # msg = ....
     # connection.send(msg)
+    pass
     ###
     # YOUR CODE HERE
     ###
-    pass
 
 from scapy.all import * # you can use scapy in this task
 
@@ -129,9 +144,13 @@ def handlePacket(switchname, event, connection):
         if isinstance(p, bytes):
             break
         p = p.next
-    print(packet.dump()) # print out unhandled packets
+    print(packet.dump()) # print out received packet
     # How to know protocol header types? see name of class
 
     # If you want to send packet back to switch, you can use of.ofp_packet_out() message.
     # Refer to [ofp_packet_out - Sending packets from the switch](https://noxrepo.github.io/pox-doc/html/#ofp-packet-out-sending-packets-from-the-switch)
     # You may learn from [l2_learning.py](pox/pox/forwarding/l2_learning.py), which implements learning switches
+    
+    ###
+    # YOUR CODE HERE
+    ###

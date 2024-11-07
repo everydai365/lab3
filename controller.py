@@ -19,23 +19,30 @@ log = core.getLogger()
 net = None
 switchcnt = 0
 
-class CS341Switch(object):
-    def __init__(self, connection):
+class Switch(object):
+
+    task_handlePacket = task_controller.handlePacket
+
+    def __init__(self, connection, controller):
         self.connection = connection
+        self.controller = controller
         connection.addListeners(self)
 
     # By default, switch will send unhandled packets to the controller
     def _handle_PacketIn(self, event):
         switchname = str(event.connection.ports[65534]).split(':',2)[0]
-        task_controller.handlePacket(switchname, event, self.connection)
+        self.task_handlePacket(switchname, event, self.connection)
 
-class CS341Controller(object):
+class Controller(object):
+    task_init = task_controller.init
+    task_addrule = task_controller.addrule
     def __init__(self):
         core.openflow.addListeners(self)
     def routeinit(self):
         global net
         net = json.load(open('/tmp/net.json'))
-        task_controller.init(net)
+        self.task_init(net)
+        self.switches = []
     def _handle_ConnectionUp(self, event):
         global net
         global switchcnt
@@ -43,14 +50,14 @@ class CS341Controller(object):
             # This is the first switch
             self.routeinit()
         switchname = str(event.connection.ports[65534]).split(':',2)[0]
-        task_controller.addrule(switchname, event.connection)
+        self.task_addrule(switchname, event.connection)
         switchcnt += 1
         if switchcnt == len(net['switches']):
             # This was the last switch
             switchcnt = 0
-        CS341Switch(event.connection)
+        self.switches.append(Switch(event.connection, self))
 def launch():
     """
     Starts the component
     """
-    core.registerNew(CS341Controller)
+    core.registerNew(Controller)

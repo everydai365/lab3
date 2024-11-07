@@ -1,18 +1,36 @@
 #!/usr/bin/python3
 
+from sys import argv
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
+hostnames = None
 
 class CS341RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/html')
-        self.end_headers()
-        client = self.client_address[0]
+        global hostnames
         host = self.headers.get('Host')
-        self.wfile.write('Hello {}, I am {}\n'.format(client,host).encode('utf-8'))
+        if host in hostnames:
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.end_headers()
+            client = self.client_address[0]
+            self.wfile.write(f'Hello {client}, I am {host}\n'.encode('utf-8'))
+            print(f'Hello {client}, I am {host}\n'.encode('utf-8'))
+        else:
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.end_headers()
+            client = self.client_address[0]
+            self.wfile.write(f'Hello {client}, I am {host}\n'.encode('utf-8'))
+            print(f'Hello {client}, I am not {host}\n'.encode('utf-8'))
+
     def do_POST(self):
         self.do_GET()
 
 if __name__ == '__main__':
+    if len(argv) < 3:
+        print('Usage: python3 server.py <hostname1> <hostname2> ...')
+        exit
+    hostnames = argv[2:]
     server = HTTPServer(('0.0.0.0', 80), CS341RequestHandler)
     server.serve_forever()
