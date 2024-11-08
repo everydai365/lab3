@@ -12,7 +12,7 @@ def gen_graph(task=1):
 
     switchneighbors = {s:set() for s in switches}
 
-    if task == 2 or task == 3 or task == 7: # For task 2, 3, 7
+    if task == 1 or task == 2 or task == 3 or task == 7: # For task 2, 3, 7
         # increase number of switches and hosts to make more complex and bigger network
         switch=10
         host=5
