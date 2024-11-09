@@ -46,7 +46,7 @@ if __name__ == '__main__':
         domains = ['task6-open.com', 'task6-block.com']
     elif args.task == 7:
         domains = [] # DIY :)
-    if len(domains) > 1:
+    if len(domains) >= 1:
         taskhosts = random.sample(net.hosts, len(domains) + 2)
         dnscmd = './dns'
         for domain, host in zip(domains, taskhosts[:-2]):
