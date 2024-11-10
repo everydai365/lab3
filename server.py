@@ -29,6 +29,8 @@ if __name__ == '__main__':
     if len(argv) < 3:
         print('Usage: python3 server.py <hostname1> <hostname2> ...')
         exit
-    hostnames = argv[2:]
+    print(argv)
+    hostnames = argv[1:] # argv: ['server.py', <hostname1>, <hostname2>, ...]
+    print(hostnames)
     server = HTTPServer(('0.0.0.0', 80), CS341RequestHandler)
     server.serve_forever()
