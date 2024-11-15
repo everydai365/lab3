@@ -25,4 +25,11 @@ class Topology(Topo):
                 
         ###
         # YOUR CODE HERE
+        while switches:
+            self.addSwitch(switches.pop(0))
+        while hosts:
+            self.addHost(hosts.pop(0))
+        while links:
+            self.addLink(links[0][0], links[0][1])
+            links.pop(0)
         ###
