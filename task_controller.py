@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 
 import pox.openflow.libopenflow_01 as of
+import heapq
 
+# Store global variables for network topology and shortest paths
+topology = {}
+shortest_paths = {}
 # KAIST CS341 SDN Lab Task 2, 3, 4
 #
 # All functions in this file runs on the controller:
@@ -64,6 +68,30 @@ import pox.openflow.libopenflow_01 as of
 ###
 # If you want, you can define global variables, import Python built-in libraries, or do others
 ###
+def dijkstra(graph, src):
+    """Compute shortest paths from the source node using Dijkstra's algorithm."""
+    distances = {node: float('inf') for node in graph}
+    distances[src] = 0
+    previous = {node: None for node in graph}
+    port_mapping = {node: None for node in graph}  # Store the port to use for each node
+
+    priority_queue = [(0, src)]  # (distance, node)
+    while priority_queue:
+        curr_distance, curr_node = heapq.heappop(priority_queue)
+
+        if curr_distance > distances[curr_node]:
+            continue
+
+        for neighbor, (weight, port) in graph[curr_node].items():
+            distance = curr_distance + weight
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                previous[neighbor] = curr_node
+                port_mapping[neighbor] = port
+                heapq.heappush(priority_queue, (distance, neighbor))
+
+    return {'distances': distances, 'previous': previous, 'ports': port_mapping}
+
 
 def init(self, net) -> None:
     #
@@ -96,6 +124,20 @@ def init(self, net) -> None:
     pass
     ###
     # YOUR CODE HERE
+    global topology, shortest_paths
+    topology = net  # Save the topology for later use
+
+    # Build a graph representation for Dijkstra's algorithm
+    graph = {}
+    for switch in net['switches'].values():
+        graph[switch['name']] = {}
+        for link in switch['links']:
+            node1, port1, node2, port2, cost = link
+            graph[node1][node2] = (cost, port1)  # Save cost and port
+
+    # Compute shortest paths from every switch to every host
+    for src in graph.keys():
+        shortest_paths[src] = dijkstra(graph, src)
     ###
 
 def addrule(self, switchname: str, connection) -> None:
@@ -114,6 +156,29 @@ def addrule(self, switchname: str, connection) -> None:
     pass
     ###
     # YOUR CODE HERE
+    global shortest_paths, topology
+
+    # Get all hosts and their IPs
+    hosts = topology['hosts']
+    for host, details in hosts.items():
+        dst_ip = details['IP']
+
+        # Find the next hop from the current switch to this host
+        path_info = shortest_paths[switchname]
+        next_hop = path_info['previous'][host]
+        if next_hop is None:
+            continue  # No path to this host
+
+        # Get the output port for the next hop
+        out_port = path_info['ports'][host]
+
+        # Create a flow rule to forward packets to this host
+        msg = of.ofp_flow_mod()
+        msg.match = of.ofp_match()
+        msg.match.dl_type = 0x0800  # IPv4
+        msg.match.nw_dst = dst_ip  # Destination IP
+        msg.actions.append(of.ofp_action_output(port=out_port))
+        connection.send(msg)
     ###
 
 from scapy.all import * # you can use scapy in this task
