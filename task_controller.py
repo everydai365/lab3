@@ -156,4 +156,14 @@ def handlePacket(self, switchname, event, connection):
 
     ###
     # YOUR CODE HERE
+    msg = of.ofp_packet_out()
+    msg.data = event.ofp  # Include the original packet
+
+    # Set the flood action: send to all ports except the one it came in on
+    msg.actions.append(of.ofp_action_output(port=of.OFPP_FLOOD))
+    msg.in_port = event.port  # Specify the incoming port
+
+    # Send the flood action back to the switch
+    connection.send(msg)
+    print(f"Flooded packet from {switchname}")
     ###
